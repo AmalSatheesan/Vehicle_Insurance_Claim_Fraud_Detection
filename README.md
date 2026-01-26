@@ -21,3 +21,16 @@ Since fraudulent claims form a minority class, accuracy alone is not sufficient.
 - **F1-Score**
 - **ROC-AUC**
 
+## 📊 Step 2: Data Loading and Understanding
+
+The raw vehicle insurance claim dataset was loaded and examined to understand its structure, feature types, and overall data quality. This step focuses on gaining familiarity with the dataset before performing any cleaning or transformations.
+
+### Dataset Overview
+- Source: Kaggle – Vehicle Insurance Claim Fraud Detection
+- Total attributes: 33
+- Target variable: Fraud indicator (binary)
+
+### Key Observations
+- The dataset contains both numerical and categorical features.
+- The target variable represents whether a claim is fraudulent or genuine.
+- Initial inspection revealed the presence of missing values and categorical dominance, which will be addressed in later steps.
