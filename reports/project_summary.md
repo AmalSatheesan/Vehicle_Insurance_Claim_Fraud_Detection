@@ -36,9 +36,11 @@ The dataset was loaded from the raw data directory and inspected to understand i
   - Categorical features
   - One binary target variable
 
+
 ### Initial Findings
 - The dataset includes multiple categorical attributes related to vehicle, policyholder, and claim details.
 - Several features contain missing values.
 - Fraud detection is expected to be an imbalanced classification problem.
 
 These observations guide the exploratory data analysis and preprocessing steps that follow.
+
