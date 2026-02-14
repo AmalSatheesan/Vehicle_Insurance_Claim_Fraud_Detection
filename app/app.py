@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
+import plotly.graph_objects as go   # ← ADD THIS
+
 
 
 # --------------------------------------------------
@@ -91,6 +93,37 @@ def predict_fraud(input_df):
 
     return fraud_prob, prediction
 
+def fraud_gauge(probability):
+
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=probability * 100,
+        title={"text": "Fraud Risk Score (%)"},
+        gauge={
+            "axis": {"range": [0, 100]},
+            
+            "bar": {"color": "red"},
+            
+            "steps": [
+                {"range": [0, 30], "color": "green"},
+                {"range": [30, 60], "color": "yellow"},
+                {"range": [60, 100], "color": "red"},
+            ],
+            
+            "threshold": {
+                "line": {"color": "black", "width": 4},
+                "thickness": 0.75,
+                "value": 40,  # Your tuned threshold
+            },
+        }
+    ))
+
+    fig.update_layout(
+        height=350,
+        margin=dict(l=20, r=20, t=50, b=20)
+    )
+
+    return fig
 
 # App Title
 st.set_page_config(
@@ -183,19 +216,25 @@ if st.button("🔍 Predict Fraud Risk"):
 
     col1, col2 = st.columns(2)
 
+    # Metric
     with col1:
         st.metric(
             label="Fraud Probability",
             value=f"{fraud_prob:.2%}"
         )
 
+        # Progress bar
+        st.progress(float(fraud_prob))
+
+    # Decision
     with col2:
         if prediction == 1:
             st.error("⚠️ High Fraud Risk Detected")
         else:
             st.success("✅ Claim Appears Genuine")
 
-
-    st.progress(float(fraud_prob))
-
-
+    # Gauge Meter
+    st.plotly_chart(
+        fraud_gauge(fraud_prob),
+        use_container_width=True
+    )
