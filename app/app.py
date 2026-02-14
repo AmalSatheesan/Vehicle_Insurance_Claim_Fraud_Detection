@@ -1,23 +1,65 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import os
 
-# Load model
-model = joblib.load(
-    "../models/balanced_random_forest.pkl"
+
+# --------------------------------------------------
+# Path Handling (Production Safe)
+# --------------------------------------------------
+
+# Get current file directory (app/)
+BASE_DIR = os.path.dirname(__file__)
+
+# Move to project root
+ROOT_DIR = os.path.abspath(
+    os.path.join(BASE_DIR, "..")
 )
 
-# Load threshold
-threshold_config = joblib.load(
-    "../models/threshold_config.pkl"
+
+# --------------------------------------------------
+# Load Model
+# --------------------------------------------------
+
+model_path = os.path.join(
+    ROOT_DIR,
+    "models",
+    "balanced_random_forest.pkl"
 )
+
+model = joblib.load(model_path)
+
+
+# --------------------------------------------------
+# Load Threshold Config
+# --------------------------------------------------
+
+threshold_path = os.path.join(
+    ROOT_DIR,
+    "models",
+    "threshold_config.pkl"
+)
+
+threshold_config = joblib.load(threshold_path)
 
 THRESHOLD = threshold_config["threshold"]
 
-# Load feature list
-model_features = joblib.load(
-    "../models/model_features.pkl"
+
+# --------------------------------------------------
+# Load Feature List
+# --------------------------------------------------
+
+features_path = os.path.join(
+    ROOT_DIR,
+    "models",
+    "model_features.pkl"
 )
+
+model_features = joblib.load(features_path)
+
+
+# Debug (optional — remove later)
+print("Artifacts Loaded Successfully")
 
 
 # Preprocessing Function
@@ -51,11 +93,19 @@ def predict_fraud(input_df):
 
 
 # App Title
-st.set_page_config(page_title="Fraud Detection App")
+st.set_page_config(
+    page_title="Fraud Detection System",
+    page_icon="🚗",
+    layout="wide"
+)
 
 st.title("🚗 Vehicle Insurance Fraud Detection")
-st.write(
-    "Predict whether a vehicle insurance claim is fraudulent."
+st.markdown(
+"""
+Detect potentially fraudulent vehicle insurance claims using a machine learning model.
+
+Fill in the claim details on the left and click **Predict Fraud Risk**.
+"""
 )
 
 
