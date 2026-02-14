@@ -10,7 +10,7 @@ import os
 
 # Get current file directory (app/)
 BASE_DIR = os.path.dirname(__file__)
-
+ 
 # Move to project root
 ROOT_DIR = os.path.abspath(
     os.path.join(BASE_DIR, "..")
@@ -114,33 +114,53 @@ Fill in the claim details on the left and click **Predict Fraud Risk**.
 st.sidebar.header("Enter Claim Details")
 
 DriverRating = st.sidebar.slider(
-    "Driver Rating", 1, 4, 2
+    "Driver Rating",
+    min_value=1,
+    max_value=4,
+    value=2,
+    help="Higher rating indicates safer driving history."
 )
 
-Policyholder_At_Fault = st.sidebar.selectbox(
-    "Policyholder At Fault?",
-    [0, 1]
+fault_option = st.sidebar.selectbox(
+    "Who is at Fault?",
+    ["Policyholder", "Third Party"],
+    help="Indicates who caused the accident."
 )
+
+Policyholder_At_Fault = 1 if fault_option == "Policyholder" else 0
+
 
 VehicleCategory = st.sidebar.selectbox(
     "Vehicle Category",
-    ["Sedan", "Sport", "Utility"]
+    ["Sedan", "Sport", "Utility"],
+    help="Type of vehicle involved in the claim."
 )
+
 
 Deductible_Bin = st.sidebar.selectbox(
-    "Deductible Bin",
-    ["Low", "Medium", "High", "Very_High"]
+    "Deductible Range",
+    ["Low", "Medium", "High", "Very_High"],
+    help="Higher deductibles may indicate risk‑sharing behavior."
 )
 
-Address_Change_Flag = st.sidebar.selectbox(
+
+address_option = st.sidebar.selectbox(
     "Recent Address Change?",
-    [0, 1]
+    ["No Change", "Address Changed"],
+    help="Frequent address changes can be a fraud signal."
 )
 
-Repeat_Claimant = st.sidebar.selectbox(
+Address_Change_Flag = 1 if address_option == "Address Changed" else 0
+
+
+repeat_option = st.sidebar.selectbox(
     "Repeat Claimant?",
-    [0, 1]
+    ["No", "Yes"],
+    help="Indicates whether claimant has prior claims history."
 )
+
+Repeat_Claimant = 1 if repeat_option == "Yes" else 0
+
 
 # Build Input DataFrame
 input_data = pd.DataFrame({
@@ -153,22 +173,29 @@ input_data = pd.DataFrame({
 })
 
 # Predict Button
-if st.button("Predict Fraud Risk"):
+st.markdown("---")
 
-    fraud_prob, prediction = predict_fraud(
-        input_data
-    )
+if st.button("🔍 Predict Fraud Risk"):
+
+    fraud_prob, prediction = predict_fraud(input_data)
 
     st.subheader("Prediction Result")
 
-    st.write(
-        f"Fraud Probability: **{fraud_prob:.2f}**"
-    )
+    col1, col2 = st.columns(2)
 
-    if prediction == 1:
-        st.error("⚠️ Fraudulent Claim Detected")
-    else:
-        st.success("✅ Genuine Claim")
+    with col1:
+        st.metric(
+            label="Fraud Probability",
+            value=f"{fraud_prob:.2%}"
+        )
 
+    with col2:
+        if prediction == 1:
+            st.error("⚠️ High Fraud Risk Detected")
+        else:
+            st.success("✅ Claim Appears Genuine")
+
+
+    st.progress(float(fraud_prob))
 
 
